@@ -19,16 +19,15 @@ class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 
-    def get_post(self):
+    def get_post_id(self):
         pattern = r'posts\/([0-9]+)'
-        post_id = re.findall(pattern, self.request.path)[0]
-        return Post.objects.get(pk=post_id)
+        return re.findall(pattern, self.request.path)[0]
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user, post=self.get_post())
+        serializer.save(author=self.request.user, post_id=self.get_post_id())
 
     def get_queryset(self):
-        return super().get_queryset().filter(post=self.get_post().pk)
+        return super().get_queryset().filter(post=self.get_post_id())
 
 
 class PostViewSet(viewsets.ModelViewSet):
