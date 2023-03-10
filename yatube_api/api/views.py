@@ -17,7 +17,8 @@ class CommentViewSet(viewsets.ModelViewSet):
         return re.findall(pattern, self.request.path)[0]
 
     def get_queryset(self):
-        return Comment.objects.filter(post=self.get_post_id())
+        return Comment.objects.filter(
+            post=self.get_post_id()).select_related('author')
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user, post_id=self.get_post_id())
@@ -25,7 +26,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 class PostViewSet(viewsets.ModelViewSet):
     permission_classes = (IsOwnerOrReadOnly, permissions.IsAuthenticated,)
-    queryset = Post.objects.all()
+    queryset = Post.objects.all().select_related('author')
     serializer_class = PostSerialiser
 
     def perform_create(self, serializer):
